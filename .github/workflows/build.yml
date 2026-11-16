@@ -39,11 +39,15 @@ jobs:
 
       - name: Pruebas unitarias
         working-directory: proyecto/thinktwice
-        run: gradle testDebugUnitTest --no-daemon
+        run: gradle testDebugUnitTest --no-daemon --console=plain 2>&1 | tee ../../build.log
 
       - name: Compilar APK debug
         working-directory: proyecto/thinktwice
-        run: gradle assembleDebug --no-daemon
+        run: gradle assembleDebug --no-daemon --console=plain 2>&1 | tee -a ../../build.log
+
+      - name: Errores de compilación (solo si falla)
+        if: failure()
+        run: grep -E "^e: |What went wrong|error:" -A2 build.log | head -60
 
       - uses: actions/upload-artifact@v4
         with:
